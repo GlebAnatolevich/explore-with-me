@@ -20,16 +20,16 @@ public class EndpointHit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @Column(name = "app")
+    @Column(name = "app", nullable = false, length = 200)
     String app;
 
-    @Column(name = "uri")
+    @Column(name = "uri", nullable = false, length = 200)
     String uri;
 
-    @Column(name = "ip")
+    @Column(name = "ip", nullable = false, length = 15)
     String ip;
 
-    @Column(name = "timestamp")
+    @Column(name = "timestamp", nullable = false)
     LocalDateTime timestamp;
 
     @Override
