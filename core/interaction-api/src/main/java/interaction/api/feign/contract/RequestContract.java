@@ -1,21 +1,29 @@
 package interaction.api.feign.contract;
 
-import interaction.api.dto.request.BulkRequestStatusUpdateCommand;
-import interaction.api.dto.request.EventRequestStatusUpdateResultDto;
-import interaction.api.dto.request.ParticipationRequestDto;
+import interaction.api.dto.request.*;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 public interface RequestContract {
+    @PostMapping(
+            value = "/requests",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    ParticipationRequestDto createRequest(@RequestBody CreateRequestCommand command);
+
+    @PatchMapping(
+            value = "/requests/{requestId}/cancel",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    ParticipationRequestDto cancelRequest(@PathVariable("requestId") @Positive Long requestId,
+                                          @RequestBody CancelRequestCommand command);
+
     @GetMapping("/users/{userId}/requests/{eventId}")
     List<ParticipationRequestDto> getCurrentUserEventRequests(@PathVariable("userId") @Positive Long initiatorId,
                                                                      @PathVariable("eventId") @Positive Long eventId);
