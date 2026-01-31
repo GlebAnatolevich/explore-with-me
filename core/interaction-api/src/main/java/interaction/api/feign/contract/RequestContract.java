@@ -39,4 +39,7 @@ public interface RequestContract {
 
     @GetMapping("/users/requests/confirmed")
     Map<Long, List<ParticipationRequestDto>> prepareConfirmedRequests(@RequestParam List<Long> eventIds);
+
+    @GetMapping("/users/requests/confirmed/{eventId}/{userId}")
+    Boolean checkRegistration(@PathVariable Long eventId, @PathVariable Long userId);
 }
