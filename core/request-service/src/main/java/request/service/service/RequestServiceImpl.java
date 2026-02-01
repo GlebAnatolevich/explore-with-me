@@ -25,6 +25,7 @@ import request.service.feign.client.UserClient;
 import request.service.mapper.RequestMapper;
 import request.service.model.ParticipationRequest;
 import request.service.repository.RequestRepository;
+import stats.client.CollectorClient;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -47,6 +50,7 @@ public class RequestServiceImpl implements RequestService {
     RequestMapper requestMapper;
     EventClient eventClient;
     UserClient userClient;
+    CollectorClient collectorClient;
 
     @Transactional(readOnly = true)
     @Override
@@ -62,6 +66,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public ParticipationRequestDto createRequest(Long requesterId, Long eventId) {
+        collectorClient.collectUserAction(requesterId, eventId, "ACTION_REGISTER", Instant.now());
         return requestMapper.toParticipationRequestDto(requestRepository.save(validateRequest(requesterId, eventId)));
     }
 
@@ -200,6 +205,14 @@ public class RequestServiceImpl implements RequestService {
             result.put(eventId, list);
         }
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Boolean checkRegistration(Long eventId, Long userId) {
+        log.info("Запрос в сервис для проверки регистрации");
+        Optional<ParticipationRequest> request = requestRepository.findByEventIdAndRequesterId(eventId, userId);
+        return request.isPresent();
     }
 
     private ParticipationRequest validateRequest(Long requesterId, Long eventId) {
